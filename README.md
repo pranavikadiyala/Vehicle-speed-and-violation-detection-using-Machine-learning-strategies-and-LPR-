@@ -170,3 +170,32 @@ with open('test_interpolated.csv', 'w', newline='') as file:
     writer = csv.DictWriter(file, fieldnames=header)
     writer.writeheader()
     writer.writerows(interpolated_data)
+
+4) visualise.py
+
+
+import ast
+import cv2
+import numpy as np
+import pandas as pd
+
+def draw_border(img, top_left, bottom_right, color=(0, 255, 0), thickness=10, line_length_x=200, line_length_y=200):
+    x1, y1 = top_left
+    x2, y2 = bottom_right
+    cv2.line(img, (x1, y1), (x1, y1 + line_length_y), color, thickness)
+    cv2.line(img, (x1, y1), (x1 + line_length_x, y1), color, thickness)
+    cv2.line(img, (x1, y2), (x1, y2 - line_length_y), color, thickness)
+    cv2.line(img, (x1, y2), (x1 + line_length_x, y2), color, thickness)
+    cv2.line(img, (x2, y1), (x2 - line_length_x, y1), color, thickness)
+    cv2.line(img, (x2, y1), (x2, y1 + line_length_y), color, thickness)
+    cv2.line(img, (x2, y2), (x2, y2 - line_length_y), color, thickness)
+    cv2.line(img, (x2, y2), (x2 - line_length_x, y2), color, thickness)
+    return img
+
+results = pd.read_csv('./test_interpolated.csv')
+cap = cv2.VideoCapture('Traffic Control CCTV.mp4')
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+fps = cap.get(cv2.CAP_PROP_FPS)
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+out = cv2.VideoWriter('./out.mp4', fourcc, fps, (width, height))

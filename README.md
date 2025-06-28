@@ -62,3 +62,38 @@ while True:
                     },
                 }
 write_csv(results, './test.csv')
+
+2)Speed_estimation.py
+import cv2
+from ultralytics import solutions
+
+input_video_path = "car_video_1.mp4"
+output_video_path = "speed_estimation.avi"
+resize_width, resize_height = 640, 360
+
+cap = cv2.VideoCapture(input_video_path)
+original_fps = int(cap.get(cv2.CAP_PROP_FPS))
+video_writer = cv2.VideoWriter(
+    output_video_path, cv2.VideoWriter_fourcc(*"mp4v"), original_fps, (resize_width, resize_height)
+)
+
+speed_obj = solutions.SpeedEstimator(
+    region=[(0, resize_height // 2), (resize_width, resize_height // 2)],
+    model="yolo11n.pt",
+    classes=[2, 3, 5, 7],
+    show=True,
+)
+
+while cap.isOpened():
+    success, frame = cap.read()
+    if not success:
+        break
+    resized_frame = cv2.resize(frame, (resize_width, resize_height))
+    processed_frame = speed_obj.estimate_speed(resized_frame)
+    video_writer.write(processed_frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+video_writer.release()
+cv2.destroyAllWindows()

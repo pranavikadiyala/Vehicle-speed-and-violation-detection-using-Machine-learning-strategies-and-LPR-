@@ -238,3 +238,28 @@ while True:
     out.write(frame)
 out.release()
 cap.release()
+
+5)util.py
+
+import string
+import easyocr
+
+reader = easyocr.Reader(['en'], gpu=False)
+dict_char_to_int = {'O': '0', 'I': '1', 'J': '3', 'A': '4', 'G': '6', 'S': '5'}
+dict_int_to_char = {'0': 'O', '1': 'I', '3': 'J', '4': 'A', '6': 'G', '5': 'S'}
+
+def write_csv(results, output_path):
+    with open(output_path, 'w') as f:
+        f.write('{},{},{},{},{},{},{}\n'.format('frame_nmr', 'car_id', 'car_bbox', 'license_plate_bbox', 'license_plate_bbox_score', 'license_number', 'license_number_score'))
+        for frame_nmr in results:
+            for car_id in results[frame_nmr]:
+                entry = results[frame_nmr][car_id]
+                if 'car' in entry and 'license_plate' in entry and 'text' in entry['license_plate']:
+                    f.write('{},{},{},{},{},{},{}\n'.format(
+                        frame_nmr, car_id,
+                        '[{} {} {} {}]'.format(*entry['car']['bbox']),
+                        '[{} {} {} {}]'.format(*entry['license_plate']['bbox']),
+                        entry['license_plate']['bbox_score'],
+                        entry['license_plate']['text'],
+                        entry['license_plate']['text_score']
+                    ))

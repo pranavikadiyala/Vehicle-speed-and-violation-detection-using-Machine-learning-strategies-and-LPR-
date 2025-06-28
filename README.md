@@ -99,7 +99,7 @@ video_writer.release()
 cv2.destroyAllWindows()
 
 
-3)
+3)interpolate.py
 
 import csv
 import numpy as np
